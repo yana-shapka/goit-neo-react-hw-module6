@@ -1,0 +1,13 @@
+.notFoundWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.notFoundImage {
+  width: 200px;
+  height: auto;
+  background-size: cover;
+  background-position: center;
+}

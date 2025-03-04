@@ -1,0 +1,16 @@
+.navigationWrapper {
+    display: flex;
+    gap: 24px;
+    padding: 24px 0 24px 0;
+    border-bottom: 2px solid black;
+}
+
+.navigationLink {
+    text-decoration: none;
+    color: black;
+  }
+  
+  .active {
+    color: red; 
+    font-weight: bold;
+  }
