@@ -1,37 +1,58 @@
-import {Routes, Route} from 'react-router-dom';
-import {lazy, Suspense} from 'react';
-import Loader from './components/Loader/Loader';
-import Navigation from './components/Navigation/Navigation.jsx';
-
-const HomePage = lazy(() => import('./pages/HomePage/HomePage.jsx'));
-const MoviesPage = lazy(() => import('./pages/MoviesPage/MoviesPage.jsx'));
-const MovieDetailsPage = lazy(() =>
-  import('./pages/MovieDetailsPage/MovieDetailsPage.jsx')
-);
-const MovieCast = lazy(() => import('./components/MovieCast/MovieCast.jsx'));
-const MovieReviews = lazy(() =>
-  import('./components/MovieReviews/MovieReviews.jsx')
-);
-const NotFoundPage = lazy(() =>
-  import('./pages/NotFoundPage/NotFoundPage.jsx')
-);
+import {useState, useEffect} from 'react';
+import {Formik} from 'formik';
+import {nanoid} from 'nanoid';
+import ContactForm from './components/ContactForm/ContactForm';
+import ContactList from './components/ContactList/ContactList';
+import SearchBox from './components/SearchBox/SearchBox';
 
 function App() {
-  return (
-    <div className='appWrapper'>
-      <Navigation />
-      <Suspense fallback={<Loader />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/movies" element={<MoviesPage />} />
-          <Route path="/movies/:movieId" element={<MovieDetailsPage />}>
-            <Route path="cast" element={<MovieCast />} />
-            <Route path="reviews" element={<MovieReviews />} />
-          </Route>
+  const loadContacts = () => {
+    const storedContacts = localStorage.getItem('contacts');
+    return storedContacts ? JSON.parse(storedContacts) : [];
+  };
 
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Suspense>
+  const [contacts, setContacts] = useState(loadContacts());
+
+  const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  const saveContact = newContact => {
+    setContacts(prevContacts => {
+      const updatedContacts = [...prevContacts, {...newContact, id: nanoid()}];
+      return updatedContacts;
+    });
+  };
+
+  const deleteContact = id => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== id)
+    );
+  };
+
+  return (
+    <div className="appWrapper">
+      <div className="formWrapper">
+        <h1>Phonebook</h1>
+        <ContactForm save={saveContact} />
+        <SearchBox
+          filter={filter}
+          setFilter={setFilter}
+          filteredContacts={filteredContacts}
+        />
+      </div>
+      <div className="listWrapper">
+        <ContactList
+          contacts={filteredContacts}
+          deleteContact={deleteContact}
+        />
+      </div>
     </div>
   );
 }
