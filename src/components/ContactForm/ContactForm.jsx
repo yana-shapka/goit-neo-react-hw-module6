@@ -1,7 +1,9 @@
 import css from './ContactForm.module.css';
-import {ErrorMessage, Field, Form, Formik} from 'formik';
-import {useId} from 'react';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { useId } from 'react';
 import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
+import { addContact } from '../../redux/contactsSlice';
 
 const customSchema = Yup.object().shape({
   name: Yup.string()
@@ -14,18 +16,19 @@ const customSchema = Yup.object().shape({
     .required('Number is required'),
 });
 
-const ContactForm = ({save}) => {
+const ContactForm = () => {
   const name = useId();
   const number = useId();
+  const dispatch = useDispatch();
 
   const handleSubmit = (values, actions) => {
-    save(values);
+    dispatch(addContact(values));
     actions.resetForm();
   };
 
   return (
     <Formik
-      initialValues={{name: '', number: ''}}
+      initialValues={{ name: '', number: '' }}
       onSubmit={handleSubmit}
       validationSchema={customSchema}
     >
